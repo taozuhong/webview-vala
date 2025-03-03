@@ -178,6 +178,7 @@ namespace Windows {
         void* lpParam
     );
 	public int SetWindowPos(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+	public int MoveWindow(void* hWnd, int X, int Y, int nWidth, int nHeight, int bRepaint);
 
 	[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "windows.h,wincred.h")]
 	namespace Credential {

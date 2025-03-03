@@ -10,8 +10,16 @@ public class Browser : Gtk.Widget {
 
     construct {
         layout_manager = new Gtk.BoxLayout(Gtk.Orientation.VERTICAL);
+    }
+
+    //  public Gtk.Widget? child {
+    //      get { return m_webview; }
+    //      set { m_webview = value; }
+    //  }
+
+    public void initialize(Gtk.Widget parent) {
 #if WINDOWS || LINUX || ANDROID
-        m_webview = new WebView.WebView(0, (void*)this.root);
+        m_webview = new WebView.WebView(0, (void*)parent.root.get_surface());
 #else  // MACOS
         //  mainWC := TCocoaWindowContentDocument(self.Handle);
         //  aRect.origin := mainWC.window.frame.origin;
@@ -31,11 +39,6 @@ public class Browser : Gtk.Widget {
         //  wvHandle := webview_create(WebView_DevTools, Pointer(wvWin));
 #endif
     }
-
-    //  public Gtk.Widget? child {
-    //      get { return m_webview; }
-    //      set { m_webview = value; }
-    //  }
     
     public override void dispose () {    
         m_webview = null;
@@ -46,7 +49,7 @@ public class Browser : Gtk.Widget {
     protected override void size_allocate(int width, int height, int baseline) {
         base.size_allocate(width, height, baseline);
         m_webview.set_size(width, height, WebView.Hint.FIXED);
-        Windows.SetWindowPos(m_webview, (void *)0, 0, 0, width, height, 0x40);
+        Windows.MoveWindow(m_webview, 0, 0, width, height, 0x01);
     }
 
     public void navigate(string url)

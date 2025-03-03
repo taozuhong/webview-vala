@@ -32,14 +32,15 @@ public class Win32Embedder : Gtk.Application {
         gtk_box.append (text_entry);
 
         Browser browser = new Browser();
-        browser.navigate("https://github.com/webview/webview");
         gtk_box.append (browser);
+        browser.initialize(gtk_box);
+        browser.navigate("https://github.com/webview/webview");
 
         window.present ();
     }
 
     public static int main (string[] args) {
-        if ((0 == args.length) || ("--embed" == args[1])) {
+        if ((1 == args.length) || ("--embed" == args[1])) {
             var app = new Win32Embedder ();
             return app.run ({});
         } else {
