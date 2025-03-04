@@ -781,6 +781,20 @@ namespace Windows {
         public DWORD dwHighDateTime;
     }
 
+    [CCode (cname = "WIN32_FIND_DATAA", has_type_id = false)]
+    public struct WIN32_FIND_DATA {
+        public uint32 dwFileAttributes;
+        public FILETIME ftCreationTime;
+        public FILETIME ftLastAccessTime;
+        public FILETIME ftLastWriteTime;
+        public uint32 nFileSizeHigh;
+        public uint32 nFileSizeLow;
+        public uint32 dwReserved0;
+        public uint32 dwReserved1;
+        public char cFileName[MAX_PATH];
+        public char cAlternateFileName[14];
+    }
+
     // 安全相关结构体
     [CCode (cname = "SECURITY_ATTRIBUTES", has_type_id = false)]
     public struct SECURITY_ATTRIBUTES {
@@ -793,22 +807,22 @@ namespace Windows {
 	public struct SHELLEXECUTEINFO {
 		public ulong 	cbSize;
 		public ulong	fMask;
-		public void*	hwnd;
+		public Handle	hwnd;
 		public string	lpVerb;
 		public string	lpFile;
 		public string	lpParameters;
 		public string	lpDirectory;
 		public int		nShow;
-		public void*	hInstApp;
+		public Handle	hInstApp;
 		public void*	lpIDList;
 		public string	lpClass;
-		public void*	hkeyClass;
+		public Handle	hkeyClass;
 		public ulong	dwHotKey;
 		[CCode (cname = "DUMMYUNIONNAME.hIcon")]
-		public void* 	hIcon;
+		public Handle 	hIcon;
 		[CCode (cname = "DUMMYUNIONNAME.hMonitor")]
-		public void*	hMonitor;
-		public void*	hProcess;
+		public Handle	hMonitor;
+		public Handle	hProcess;
 	}
 
     [CCode (cname = "STARTUPINFO", has_type_id = false)]
@@ -1069,6 +1083,23 @@ namespace Windows {
     public const HRESULT E_INVALIDARG;
     public const HRESULT E_UNEXPECTED;
 
+    // 文件属性
+    public const uint32 MAX_PATH;
+    public const uint32 FILE_ATTRIBUTE_READONLY;
+    public const uint32 FILE_ATTRIBUTE_HIDDEN;
+    public const uint32 FILE_ATTRIBUTE_SYSTEM;
+    public const uint32 FILE_ATTRIBUTE_DIRECTORY;
+    public const uint32 FILE_ATTRIBUTE_ARCHIVE;
+    public const uint32 FILE_ATTRIBUTE_DEVICE;
+    public const uint32 FILE_ATTRIBUTE_NORMAL;
+    public const uint32 FILE_ATTRIBUTE_TEMPORARY;
+    public const uint32 FILE_ATTRIBUTE_SPARSE_FILE;
+    public const uint32 FILE_ATTRIBUTE_REPARSE_POINT;
+    public const uint32 FILE_ATTRIBUTE_COMPRESSED;
+    public const uint32 FILE_ATTRIBUTE_OFFLINE;
+    public const uint32 FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+    public const uint32 FILE_ATTRIBUTE_ENCRYPTED;
+
     [CCode (cname = "CloseHandle")]
     public int CloseHandle(Handle hObject);
 
@@ -1151,11 +1182,11 @@ namespace Windows {
     [CCode (cname = "SendMessage")]
     public LRESULT SendMessage(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-    [CCode (cname = "GetWindowLongA")]
-    public ssize_t GetWindowLong(Handle hWnd, int32 nIndex);
+    [CCode (cname = "GetWindowLongPtrA")]
+    public LONG_PTR GetWindowLongPtr(Handle hWnd, int32 nIndex);
 
-    [CCode (cname = "SetWindowLongA")]
-    public ssize_t SetWindowLong(Handle hWnd, int32 nIndex, ssize_t dwNewLong);
+    [CCode (cname = "SetWindowLongPtrA")]
+    public LONG_PTR SetWindowLongPtr(Handle hWnd, int32 nIndex, LONG_PTR dwNewLong);
 
     [CCode (cname = "GetWindowRect")]
     public bool GetWindowRect(Handle hWnd, out RECT lpRect);
@@ -1208,8 +1239,47 @@ namespace Windows {
         void* Arguments
     );
 
+    // File Functions
+    [CCode (cname = "FindFirstFileA")]
+    public Handle FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
+
+    [CCode (cname = "FindNextFileA")]
+    public bool FindNextFile(Handle hFindFile, out WIN32_FIND_DATA lpFindFileData);
+
+    [CCode (cname = "FindClose")]
+    public bool FindClose(Handle hFindFile);
+
+    [CCode (cname = "GetFileAttributesA")]
+    public uint32 GetFileAttributes(string lpFileName);
+
+    [CCode (cname = "SetFileAttributesA")]
+    public BOOL SetFileAttributes(string lpFileName, DWORD dwFileAttributes);
+
+    [CCode (cname = "GetFileSizeEx")]
+    public bool GetFileSizeEx(Handle hFile, out int64 lpFileSize);
+
+    [CCode (cname = "GetDiskFreeSpaceA")]
+    public bool GetDiskFreeSpace(
+        string lpRootPathName,
+        out uint32 lpSectorsPerCluster,
+        out uint32 lpBytesPerSector,
+        out uint32 lpNumberOfFreeClusters,
+        out uint32 lpTotalNumberOfClusters
+    );
+
+    [CCode (cname = "GetDiskFreeSpaceExA")]
+    public bool GetDiskFreeSpaceEx(
+        string lpDirectoryName,
+        out uint64 lpFreeBytesAvailable,
+        out uint64 lpTotalNumberOfBytes,
+        out uint64 lpTotalNumberOfFreeBytes
+    );
+
+    [CCode (cname = "GetDriveTypeA")]
+    public uint32 GetDriveType(string lpRootPathName);
+
     // Module Functions
-    [CCode (cname = "GetModuleHandle")]
+    [CCode (cname = "GetModuleHandleA")]
     public HMODULE GetModuleHandle(string? lpModuleName);
 
     [CCode (cname = "GetModuleFileNameA")]
